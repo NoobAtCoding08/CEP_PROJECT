@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenders in {{ department.name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            width: 60%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        h2 {
+            background: #3c4b64;
+            color: white;
+            padding: 15px;
+            margin: 0;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #f9f9f9;
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        li:hover {
+            background: #e0e0e0;
+        }
+        li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            display: block;
+        }
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .buttons a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+        .back-btn {
+            background: #007BFF;
+        }
+        .back-btn:hover {
+            background: #0056b3;
+        }
+        .logout-btn {
+            background: #DC3545;
+        }
+        .logout-btn:hover {
+            background: #a71d2a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Tenders in {{ department.name }}</h2>
+        <ul>
+            {% for tender in tenders %}
+                <li>
+                    <a href="{% url 'tender_details' tender.id %}">
+                        {{ tender.tender_number }} - {{ tender.name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="buttons">
+            <a href="{% url 'select_department' %}" class="back-btn">Back to Departments</a>
+            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+</body>
+</html>

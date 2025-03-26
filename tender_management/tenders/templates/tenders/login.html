@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: black;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Professional Gradient Background */
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, #141e30, #243b55);
+        }
+
+        /* Soft Glow Effects */
+        .glow1, .glow2 {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.3;
+        }
+
+        .glow1 {
+            background: #00bcd4;
+            top: 10%;
+            left: 20%;
+        }
+
+        .glow2 {
+            background: #9c27b0;
+            bottom: 10%;
+            right: 20%;
+        }
+
+        .login-box {
+            position: relative;
+            width: 350px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .login-box h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .input-box {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+            outline: none;
+            color: white;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .input-box input:focus {
+            border-bottom-color: #00e5ff;
+        }
+
+        .input-box i {
+            position: absolute;
+            right: 10px;
+            top: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: #00e5ff;
+            border: none;
+            color: black;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #00bcd4;
+            box-shadow: 0 0 15px #00e5ff;
+        }
+
+        .links {
+            margin-top: 10px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .links a {
+            color: #00e5ff;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .links a:hover {
+            color: #00bcd4;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="background"></div>
+<div class="glow1"></div>
+<div class="glow2"></div>
+
+<div class="login-box">
+    <h2>Enter Details</h2>
+    
+    <div class="input-box">
+        <input type="email" placeholder="Email" id="email">
+    </div>
+    <div class="input-box">
+        <input type="department" placeholder="Department" id="department">
+    </div>
+
+    <div class="input-box">
+        <input type="contact" placeholder="Contact" id="contact">
+    </div>
+
+    <div class="input-box">
+        <input type="password" placeholder="Password" id="password">
+        <i onclick="togglePassword()">👁️</i>
+    </div>
+
+    <form action="{% url 'select_department'%}" method="get">
+        <button type="submit "class="btn">Login</button>
+    </form>
+
+
+    <div class="links">
+        <p><a href="#">Forgot Password?</a></p>
+        <p>New here? <a href="#">Sign Up</a></p>
+    </div>
+</div>
+
+<script>
+    function togglePassword() {
+        let pass = document.getElementById("password");
+        if (pass.type === "password") {
+            pass.type = "text";
+        } else {
+            pass.type = "password";
+        }
+    }
+</script>
+
+</body>
+</html>
