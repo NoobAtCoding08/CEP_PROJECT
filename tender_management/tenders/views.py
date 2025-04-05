@@ -3,18 +3,34 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Department, Tender, Vendor
 from django.contrib.auth.models import User
+from django.shortcuts import redirect
+from django.urls import reverse
 
 # Login View
 def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
+        role = request.POST.get("role")  # "clerk" or "hod"
+
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+
+            # Store role in session if needed
+            request.session['role'] = role
+
+            # Redirect based on role
+            if role == "clerk":
+                return redirect("/admin/")  # Django Admin Panel
+            elif role == "hod":
+                return redirect("select_department")  # Custom dashboard
+
+            # Fallback
             return redirect("select_department")
         else:
             return render(request, "tenders/login.html", {"error": "Invalid credentials"})
+
     return render(request, "tenders/login.html")
 
 # Logout View
