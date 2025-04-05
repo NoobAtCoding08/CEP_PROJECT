@@ -1,60 +1,35 @@
+import nested_admin  # ✅ Import nested admin
 from django.contrib import admin
-from django.utils.html import format_html  # Use for HTML rendering in admin
+from django.utils.html import format_html
 from .models import Department, Tender, Vendor, VendorDocument, ShortfallDocument
 
-# Custom Admin for Tender
-class TenderAdmin(admin.ModelAdmin):
+# ✅ Vendor Documents Inline (Nested under Vendor)
+class VendorDocumentInline(nested_admin.NestedTabularInline):  # ✅ Use Nested Inline
+    model = VendorDocument
+    extra = 1
+    fields = ('file',)
+
+# ✅ Shortfall Documents Inline (Nested under Vendor)
+class ShortfallDocumentInline(nested_admin.NestedTabularInline):  # ✅ Use Nested Inline
+    model = ShortfallDocument
+    extra = 1
+    fields = ('shortfall_stage', 'file', 'reason')
+    ordering = ['shortfall_stage']
+
+# ✅ Vendor Inline (Now includes Documents and Shortfall)
+class VendorInline(nested_admin.NestedTabularInline):  # ✅ Use Nested Inline
+    model = Vendor
+    extra = 1
+    fields = ('name',)
+    inlines = [VendorDocumentInline, ShortfallDocumentInline]  # ✅ Nest Documents under Vendors
+
+# ✅ Tender Admin (To Show Vendors Inside Tender)
+class TenderAdmin(nested_admin.NestedModelAdmin):  # ✅ Use NestedModelAdmin
     list_display = ('name', 'tender_number', 'department', 'published_date')
     list_filter = ('department',)
     search_fields = ('name', 'tender_number')
+    inlines = [VendorInline]  # ✅ Now Vendors and their Documents appear inside Tenders
 
-# Inline Model for VendorDocument (Allows document uploads in admin)
-class VendorDocumentInline(admin.TabularInline):
-    model = VendorDocument
-    extra = 1  # Allows adding one extra document field
-    fields = ('file',)
-
-# Inline Model for Shortfall Documents
-class ShortfallDocumentInline(admin.TabularInline):
-    model = ShortfallDocument
-    extra = 1  # Allow adding multiple documents
-    fields = ('shortfall_stage', 'file', 'reason')  # Ensure dropdown is visible
-    ordering = ['shortfall_stage']
-    autocomplete_fields = ['vendor']  # Allow easy vendor selection
-
-# Custom Admin for Vendor
-class VendorAdmin(admin.ModelAdmin):
-    list_display = ('name', 'tender', 'get_document_links', 'get_shortfall_document_links')
-    list_filter = ('tender',)
-    search_fields = ('name', 'tender__name')
-    inlines = [VendorDocumentInline, ShortfallDocumentInline]  # ✅ Add Shortfall Inline here
-
-    def get_document_links(self, obj):
-        documents = obj.documents.all()
-        if documents:
-            return format_html(
-                "<br>".join(
-                    f'<a href="{doc.file.url}" target="_blank">📄 Document {idx+1}</a>'
-                    for idx, doc in enumerate(documents)
-                )
-            )
-        return "No documents"
-
-    def get_shortfall_document_links(self, obj):
-        shortfalls = obj.shortfall_documents.all()
-        if shortfalls:
-            return format_html(
-                "<br>".join(
-                    f'<a href="{doc.file.url}" target="_blank">📂 {doc.get_shortfall_stage_display()}</a>'
-                    for doc in shortfalls
-                )
-            )
-        return "No shortfall documents"
-
-    get_document_links.short_description = "Submitted Documents"
-    get_shortfall_document_links.short_description = "Shortfall Documents"  # ✅ Add short description
-
-# Register Models
+# ✅ Register Models
 admin.site.register(Department)
-admin.site.register(Tender, TenderAdmin)
-admin.site.register(Vendor, VendorAdmin)
+admin.site.register(Tender, TenderAdmin)  # ✅ Now Vendors & Docs are inside Tender
