@@ -4,7 +4,10 @@ from django.contrib.auth.decorators import login_required
 from .models import Department, Tender, Vendor
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
+from .models import Vendor, VendorDocument, ShortfallDocument
 from django.urls import reverse
+from .forms import VendorForm, VendorDocumentForm, ShortfallDocumentForm
+from django.forms import modelformset_factory
 
 # Login View
 def login_view(request):
@@ -73,5 +76,50 @@ def shortfall_details(request, vendor_id, stage):
         "vendor": vendor,
         "shortfall_documents": shortfall_documents,
         "stage": stage,
+    })
+    
+    
+    
+    
+def add_vendor_to_tender(request, tender_id):
+    tender = get_object_or_404(Tender, id=tender_id)
+
+    VendorDocumentFormSet = modelformset_factory(VendorDocument, form=VendorDocumentForm, extra=1)
+    ShortfallDocumentFormSet = modelformset_factory(ShortfallDocument, form=ShortfallDocumentForm, extra=1)
+
+    if request.method == 'POST':
+        vendor_form = VendorForm(request.POST)
+        doc_formset = VendorDocumentFormSet(request.POST, request.FILES, queryset=VendorDocument.objects.none())
+        shortfall_formset = ShortfallDocumentFormSet(request.POST, request.FILES, queryset=ShortfallDocument.objects.none())
+
+        if vendor_form.is_valid() and doc_formset.is_valid() and shortfall_formset.is_valid():
+            vendor = vendor_form.save(commit=False)
+            vendor.tender = tender
+            vendor.save()
+
+            for form in doc_formset:
+                if form.cleaned_data:
+                    doc = form.save(commit=False)
+                    doc.vendor = vendor
+                    doc.save()
+
+            for form in shortfall_formset:
+                if form.cleaned_data:
+                    shortfall = form.save(commit=False)
+                    shortfall.vendor = vendor
+                    shortfall.save()
+
+            return redirect('clerk_tenders')  # or redirect to tender detail
+
+    else:
+        vendor_form = VendorForm()
+        doc_formset = VendorDocumentFormSet(queryset=VendorDocument.objects.none())
+        shortfall_formset = ShortfallDocumentFormSet(queryset=ShortfallDocument.objects.none())
+
+    return render(request, 'add_vendor.html', {
+        'tender': tender,
+        'vendor_form': vendor_form,
+        'doc_formset': doc_formset,
+        'shortfall_formset': shortfall_formset
     })
     
