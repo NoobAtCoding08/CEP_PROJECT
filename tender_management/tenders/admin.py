@@ -1,13 +1,29 @@
 import nested_admin  # ✅ Import nested admin
 from django.contrib import admin
 from django.utils.html import format_html
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin
 from .models import Department, Tender, Vendor, VendorDocument, ShortfallDocument
+from .models import Profile
+
+
+class ProfileInline(admin.StackedInline):
+    model = Profile
+    can_delete = False
+    verbose_name_plural = 'Role'
+
+class CustomUserAdmin(UserAdmin):
+    inlines = (ProfileInline,)
+    
+admin.site.unregister(User)
+admin.site.register(User, CustomUserAdmin)
 
 # ✅ Vendor Documents Inline (Nested under Vendor)
 class VendorDocumentInline(nested_admin.NestedTabularInline):  # ✅ Use Nested Inline
     model = VendorDocument
     extra = 1
     fields = ('file',)
+
 
 # ✅ Shortfall Documents Inline (Nested under Vendor)
 class ShortfallDocumentInline(nested_admin.NestedTabularInline):  # ✅ Use Nested Inline

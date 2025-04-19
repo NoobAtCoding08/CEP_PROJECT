@@ -8,33 +8,39 @@ from .models import Vendor, VendorDocument, ShortfallDocument
 from django.urls import reverse
 from .forms import VendorForm, VendorDocumentForm, ShortfallDocumentForm
 from django.forms import modelformset_factory
+from .models import Profile
 
 # Login View
 def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
-        role = request.POST.get("role")  # "clerk" or "hod"
+        selected_role = request.POST.get("role")  # e.g., 'clerk' or 'hod'
 
         user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
+        if user:
+            try:
+                profile = user.profile
+            except Profile.DoesNotExist:
+                return render(request, "tenders/login.html", {"error": "User profile not found."})
 
-            # Store role in session if needed
-            request.session['role'] = role
+            if profile.role != selected_role:
+                return render(request, "tenders/login.html", {"error": f"You are not authorized as {selected_role}."})
+
+            login(request, user)
+            request.session['role'] = selected_role
 
             # Redirect based on role
-            if role == "clerk":
-                return redirect("/admin/")  # Django Admin Panel
-            elif role == "hod":
-                return redirect("select_department")  # Custom dashboard
+            if selected_role == "clerk":
+                return redirect("/admin/")
+            elif selected_role == "hod":
+                return redirect("select_department")
 
-            # Fallback
-            return redirect("select_department")
         else:
-            return render(request, "tenders/login.html", {"error": "Invalid credentials"})
+            return render(request, "tenders/login.html", {"error": "Invalid username or password."})
 
     return render(request, "tenders/login.html")
+
 
 # Logout View
 def logout_view(request):
